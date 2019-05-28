@@ -5,13 +5,12 @@ import ModalWrapper from "../ModalWrapper";
 import Button from "../../common/Button";
 import OutlinedTextField from "../OutlinedTextField";
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUserFriends, faFileAlt, faFileSignature, faFolderPlus } from '@fortawesome/free-solid-svg-icons';
+import { faUserFriends, faFileAlt, faFileSignature } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 library.add(faUserFriends);
 library.add(faFileAlt);
 library.add(faFileSignature);
-library.add(faFolderPlus);
 
 const cx = classNames.bind(styles);
 
@@ -25,7 +24,6 @@ class OneInputModal extends React.Component{
         };
     };
 
-
     handleTextChange = (event) => {
         this.setState({ name: event.target.value });
     };
@@ -36,6 +34,16 @@ class OneInputModal extends React.Component{
 
         const { handleTextChange } = this;
         return (
+            <div tabIndex="-1"
+            onKeyDown={(e) => {
+                if(e.key === 'Enter') {
+                    onConfirm(id,this.state.name); 
+                    onCancel();
+                }
+                if(e.keyCode === 27) {
+                    onCancel();
+                }
+            }}>
             <ModalWrapper visible={visible}>
                 <div className={cx("question")}>
                     <div className={cx("title")}>
@@ -58,6 +66,7 @@ class OneInputModal extends React.Component{
                     </Button>
                 </div>
             </ModalWrapper>
+            </div>
         )
     }
 }

@@ -16,7 +16,7 @@ library.add(faKey);
 const cx = classNames.bind(styles);
 
 class NoticeModal extends React.Component {
-    static defaultProps = {
+       static defaultProps = {
         modal_icon: 'share-square'
     };
 
@@ -33,8 +33,18 @@ class NoticeModal extends React.Component {
                 modal_icon, modal_title, modal_content, btn_name } = this.props;
 
         return (
+            <div tabIndex="-1"
+            onKeyDown={(e) => {
+                if(e.key === 'Enter') {
+                    onConfirm(id); 
+                    onCancel();
+                }
+                if(e.keyCode === 27) {
+                    onCancel();
+                }
+            }}>
             <ModalWrapper visible={visible}>
-                <div className={cx("question")}>
+                <div className={cx("question")} >
                     <div className={cx("title")}>
                         <FontAwesomeIcon icon={modal_icon} size="2x" color="#1C90FB" />
                         &nbsp;&nbsp;&nbsp;&nbsp;<strong>{modal_title}</strong>
@@ -47,6 +57,7 @@ class NoticeModal extends React.Component {
                     </div>
                     
                     <br />
+                    <button id= "focus" autoFocus/>
                 </div>
 
                 <div className={cx("options")}>
@@ -55,7 +66,9 @@ class NoticeModal extends React.Component {
                         {btn_name}
                     </Button>
                 </div>
+                
             </ModalWrapper>
+            </div>
         );
     }
 }

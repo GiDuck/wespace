@@ -9,7 +9,7 @@ import { Delete, Brightness1 } from "@material-ui/icons";
 import { Switch } from 'react-router-dom';
 import {modalList} from "../../../modal/modalData.js";
 
-import { handleNoteData, handleFriendData, handleSetModal,
+import { handleChatDrawerOpen, handleNoteData, handleFriendData, handleSetModal,
     handleSubDrawerOpen, handleFolderData} from "../handler.js";
 
 export function FolderContextmenu (item) { return (
@@ -103,7 +103,7 @@ export function FileContextmenu (item) {return (
                 <MenuItem onClick={null}>
                     친구삭제
                 </MenuItem>
-                <MenuItem onClick={null}>
+                <MenuItem onClick={ (e)=>handleChatDrawerOpen()}>
                     채팅하기
                 </MenuItem>
             </ContextMenu>

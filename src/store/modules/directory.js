@@ -1,3 +1,4 @@
+// createAction: 액션생성 자동화
 import { createAction, handleActions } from "redux-actions";
 
 import { Map } from "immutable";
@@ -9,10 +10,13 @@ const SHARED_LIST = "directory/SHARED_LIST";
 const PRIVATE_LIST = "directory/PRIVATE_LIST";
 const NOTE_LIST = "directory/NOTE_LIST";
 
-const CREATE_FOLDER="directory/CREATE_FOLDER";
-const DELETE_FOLDER="directory/DELETE_FOLDER";
-const SHARED_FOLDER="directory/SHARED_FOLDER";
-const UPDATE_FOLDER="directory/UPDATE_FOLDER";
+// folder CRUD of action types
+const CREATE_FOLDER = "directory/CREATE_FOLDER";
+const UPDATE_FOLDER = "directory/UPDATE_FOLDER";
+const DELETE_FOLDER = "directory/DELETE_FOLDER";
+
+const SHARED_FOLDER = "directory/SHARED_FOLDER";
+const UNSHARED_FOLDER = "directory/UNSHARED_FOLDER";
 
 const CREATE_NOTE="directroy/CREATE_NOTE";
 const UPDATE_NOTE="directory/UPDATE_NOTE";
@@ -32,9 +36,10 @@ export const getPrivateList = createAction(PRIVATE_LIST, api.getPrivateList);
 export const getNoteList = createAction(NOTE_LIST, api.getNoteList);
 
 export const createFolder = createAction(CREATE_FOLDER, api.createFolder);
-export const deleteFolder =  createAction(DELETE_FOLDER, api.deleteFolder);
-export const sharedFolder = createAction(SHARED_FOLDER,api.sharedFolder);
 export const updateFolder = createAction(UPDATE_FOLDER, api.updateFolder);
+export const deleteFolder = createAction(DELETE_FOLDER, api.deleteFolder);
+export const sharedFolder = createAction(SHARED_FOLDER, api.sharedFolder);
+export const unsharedFolder = createAction(UNSHARED_FOLDER, api.unsharedFolder);
 
 export const createNote = createAction(CREATE_NOTE, api.createNote);
 export const updateNote = createAction(UPDATE_NOTE, api.updateNote);
@@ -55,10 +60,19 @@ const initialState = Map({
     note:null
 });
 
+
+
 // reducer
-export default handleActions(
+export default handleActions({
+    ...pender(
     {
-            ...pender(
+        type: [PRIVATE_LIST],
+        onSuccess: (state, action) => {
+            const { data: privateList } = action.payload.data;
+            return state.set("privateList", privateList);
+        }
+    }),            
+    ...pender(
             {
                 type: [PRIVATE_LIST],
                 onSuccess: (state, action) => {
@@ -66,16 +80,14 @@ export default handleActions(
                     return state.set("privateList", privateList);
                 }
             }),
-            ...pender(
-            {
+    ...pender({
                 type: [SHARED_LIST],
                 onSuccess: (state, action) => {
                     const { data: sharedList } = action.payload.data;
                     return state.set("sharedList", sharedList); 
                 }
             }),
-            ...pender(
-            {
+    ...pender({
                 type: [NOTE_LIST],
                 onSuccess: (state, action) => {
                     const { data: noteList } = action.payload.data;
@@ -120,6 +132,4 @@ export default handleActions(
                 });
                 return state.set('friends', newFriend);
             }
-    },
-    initialState
-);
+}, initialState);

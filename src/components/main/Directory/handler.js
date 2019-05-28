@@ -71,3 +71,12 @@
     export function handleFriendData(friend_id, friend_name, note_content) {
         this.setState({friend_id: friend_id , friend_name: friend_name });
     };
+
+    export function handleChatDrawerOpen (){
+        this.setState({ SubOpen: false });
+        this.setState({ ChatOpen: true });
+    };
+
+    export function handleChatDrawerClose () {
+        this.setState({ ChatOpen: false });
+    }

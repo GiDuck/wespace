@@ -1,21 +1,20 @@
-import React, { Component } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as directoryActions from "store/modules/directory";
-import Directory from "components/main/Directory/Directory.js";
+import * as UserActions from "store/modules/user";
+import Directory from "components/main/Directory/Directory";
 import {withRouter} from 'react-router-dom';
 import socketio from 'socket.io-client';
+const socket=socketio.connect('http://localhost:4000');
 
-const socket = socketio.connect('http://localhost:4000');
+class DirectoryContainer extends React.Component {
 
-
-class DirectoryContainer extends Component {
-
-    updateFolderList = () => {
-        const { DirectoryActions, id } = this.props;
-        if (id) {
-            DirectoryActions.getPrivateList(id);
-            DirectoryActions.getSharedList(id);
+    updateFolderList=()=>{
+        const {DirectoryActions,id}=this.props;
+        if(id){
+        DirectoryActions.getPrivateList(id);
+        DirectoryActions.getSharedList(id);
         }
     }
 
@@ -25,7 +24,15 @@ class DirectoryContainer extends Component {
 
     }
     sharedFolder=async(user_id,folder_id,permission)=>{
-        await this.props.DirectoryActions.sharedFolder(user_id,folder_id,permission);
+        const {UserActions,DirectoryActions,folder}=this.props;
+        await DirectoryActions.sharedFolder(user_id,folder_id,permission);
+        await UserActions.getUserList(folder);
+        socket.emit('updateFolderList',{ msg:'sharedFolder'});
+    }
+    unsharedFolder=async(folder_id,user_id)=>{
+        const {UserActions,DirectoryActions,folder}=this.props;
+        await DirectoryActions.unsharedFolder(folder_id,user_id);
+        await UserActions.getUserList(folder);
         socket.emit('updateFolderList',{ msg:'sharedFolder'});
     }
 
@@ -43,11 +50,11 @@ class DirectoryContainer extends Component {
 
 
 
-    updateNoteList = () => {
-        const { DirectoryActions, folder } = this.props;
-        console.log('updateNoteList::', folder);
+    updateNoteList=()=>{
+        const {DirectoryActions,folder}=this.props;
+        console.log('updateNoteList::',folder);
         if(folder)
-            DirectoryActions.getNoteList(folder);
+        DirectoryActions.getNoteList(folder);
     }
 
     createNote=async(folder_id,note_name)=>{
@@ -65,12 +72,11 @@ class DirectoryContainer extends Component {
 
     }
 
-    deleteNote = async(ids) => {
+    deleteNote=async(ids) => {
         const {DirectoryActions} = this.props;
         await DirectoryActions.deleteNote(ids.note_id);
-        // socket.emit( event name to the server, data )
-        socket.emit('updateFolderList', { msg: 'deleteNote' });
-        socket.emit('updateNoteList', { msg: 'deleteNote' });
+        socket.emit('updateFolderList',{ msg:'deleteNote'});
+        socket.emit('updateNoteList',{ msg:'deleteNote'});
 
         DirectoryActions.setNote(null);
     }
@@ -155,13 +161,12 @@ class DirectoryContainer extends Component {
 
     render() {
         const { sharedList,privateList, noteList, id, friends} = this.props;
-        const { createFolder,sharedFolder, deleteFolder, updateFolder, updateNote, createNote, deleteNote, setNote,setFolder} = this;
-    
+        const { createFolder,sharedFolder,unsharedFolder, deleteFolder, updateFolder, updateNote, createNote, deleteNote, setNote,setFolder} = this;
         return (
             <div style={{ display: "flex" }}>
                 <Directory 
                 sharedList={sharedList} privateList={privateList}  noteList={noteList} user_id={id}
-                createFolder={createFolder} updateFolder={updateFolder} deleteFolder={deleteFolder} sharedFolder={sharedFolder} 
+                createFolder={createFolder} updateFolder={updateFolder} deleteFolder={deleteFolder} sharedFolder={sharedFolder} unsharedFolder={unsharedFolder}
                 createNote={createNote} updateNote={updateNote}  deleteNote={deleteNote} 
                 setNote={setNote} setFolder={setFolder}
                 friends = {friends}
@@ -181,6 +186,7 @@ export default connect(
         id: state.user.get("id"),
     }),
     (dispatch) => ({
-        DirectoryActions: bindActionCreators(directoryActions, dispatch)
+        DirectoryActions: bindActionCreators(directoryActions, dispatch),
+        UserActions: bindActionCreators(UserActions, dispatch),
     })
 )(withRouter(DirectoryContainer));

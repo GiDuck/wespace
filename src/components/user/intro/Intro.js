@@ -3,6 +3,7 @@ import "./Intro.scss";
 import ReactPlayer from "react-player";
 import Modal from "react-modal";
 import PlayButton from "../../../image/btn-play.png";
+import {withRouter} from 'react-router-dom';
 
 const modalcustom = {
     content: {
@@ -16,11 +17,10 @@ const modalcustom = {
 };
 
 class intro extends Component {
-    constructor() {
-        super();
-
+    constructor(props) {
+        super(props);
         this.state = {
-            modalIsOpen: false
+            modalIsOpen: false,
         };
 
         this.openModal = this.openModal.bind(this);
@@ -39,19 +39,17 @@ class intro extends Component {
         return (
             <div className="intro">
                 <div className="left-page">
-                    <p className="maintext">
+                    <div className="maintext">
                         <br />
                         효율적인 업무 공유 <br />
                         스마트한 노트 공간,
                         <br />
-                       
-                    </p>
-                    <h3 className="maintext">WESPACE</h3>
-                    <p className="subtext">
+                    </div>
+                    <div className="subtext">
                         타 플랫폼의 도움이 필요 없이, <br />
                         WESPACE 에서 모두 확인할 수 있도록 <br />
                         편리한 유저 경험을 담았습니다. <br />
-                    </p>
+                    </div>
                     <br />
                 </div>
                 <div className="right-page">
@@ -83,4 +81,4 @@ class intro extends Component {
     }
 }
 
-export default intro;
+export default withRouter(intro);
