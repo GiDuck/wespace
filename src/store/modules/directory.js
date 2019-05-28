@@ -20,6 +20,10 @@ const DELETE_NOTE="directory/DELETE_NOTE";
 const SET_NOTE="directory/SET_NOTE";
 const SET_FOLDER="directory/SET_FOLDER";
 
+const SET_FRIENDS="directory/SET_FRIENDS";
+const SET_JOIN_FRIEND="directory/SET_JOIN_FRIEND";
+const SET_OUT_FRIEND="directory/SET_OUT_FRIEND";
+
 
 
 // action creators
@@ -37,13 +41,16 @@ export const updateNote = createAction(UPDATE_NOTE, api.updateNote);
 export const deleteNote = createAction(DELETE_NOTE, api.updateNoteStatusDeleted);
 export const setNote = createAction(SET_NOTE);
 export const setFolder = createAction(SET_FOLDER);
-
+export const setFriends = createAction(SET_FRIENDS);
+export const setJoinFriend = createAction(SET_JOIN_FRIEND);
+export const setOutFriend = createAction(SET_OUT_FRIEND);
 
 // initial state
 const initialState = Map({
     sharedList: [],
     privateList: [],
     noteList: [],
+    friends:[],
     folder:null,
     note:null
 });
@@ -84,6 +91,35 @@ export default handleActions(
                 console.log("SET_FOLDER",folder);
                 return state.set('folder', folder);
             },
+            [SET_FRIENDS]: (state, action) => {
+                const { payload: friends } = action;
+                console.log("SET_FRIENDS",friends);
+                return state.set('friends', friends);
+            },
+            [SET_JOIN_FRIEND]: (state, action) => {
+                const { payload: friendId } = action;
+                const friends = state.get("friends");
+                const newFriend = friends.map(el=>{
+                    if(parseInt(el.id) === parseInt(friendId)){
+
+                        el.joined = true;
+                    }
+                    return el;
+                });
+
+                return state.set('friends', newFriend);
+            },
+            [SET_OUT_FRIEND]: (state, action) => {
+                const { payload: friendId } = action;
+                const friends = state.get("friends");
+                const newFriend = friends.map(el=>{
+                    if(parseInt(el.id) === parseInt(friendId)){
+                        el.joined = false;
+                    }
+                    return el;
+                });
+                return state.set('friends', newFriend);
+            }
     },
     initialState
 );

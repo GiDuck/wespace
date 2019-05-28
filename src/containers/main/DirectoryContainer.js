@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as directoryActions from "store/modules/directory";
-import Directory from "components/main/Directory";
+import Directory from "components/main/Directory/Directory.js";
 import {withRouter} from 'react-router-dom';
-
 import socketio from 'socket.io-client';
-const socket=socketio.connect('http://192.168.0.70:4000');
+
+const socket = socketio.connect('http://localhost:4000');
 
 
 class DirectoryContainer extends Component {
@@ -85,16 +85,39 @@ class DirectoryContainer extends Component {
        
         DirectoryActions.setFolder(folder_id);
         DirectoryActions.getNoteList(folder_id);
+    }
+
+    setFriends=(friends)=>{
+
+        const {DirectoryActions, id} = this.props;
+        DirectoryActions.setFriends(friends);
         
     }
 
+    joinFriend = (friendId) =>{
+        const {DirectoryActions} = this.props;
+        DirectoryActions.setJoinFriend(friendId);
+        console.log("joinFriend");
+        console.log(DirectoryActions.setJoinFriend);
+
+    }
+
+    outFriend = (friendId) =>{
+        
+        const {DirectoryActions} = this.props;
+        DirectoryActions.setOutFriend(friendId);
+
+    }
 
 
     componentWillMount(){
         setTimeout(()=>{
             if(this.props.id){
                 this.updateFolderList();
-                }else{
+                socket.emit('join', {id : this.props.id});
+                socket.emit('getFriendList', {id : this.props.id});
+
+            }else{
                     this.props.history.push('/');
                 }
         }, 1000);
@@ -103,15 +126,37 @@ class DirectoryContainer extends Component {
     componentDidMount(){
         socket.on('updateFolderList',(obj)=>{
             this.updateFolderList();
-        })
+        });
+
         socket.on('updateNoteList',(obj)=>{
             this.updateNoteList();
-        })
+        });
+        socket.on('getFriendList', obj => {
+            this.setFriends(obj);
+        });
+        socket.on('friendJoin', friend => {
+            this.joinFriend(friend);
+
+            console.log("this?");
+            console.log(this);
+            console.log("친구가 들어왔네");
+            console.log(friend);
+        });
+
+        socket.on('friendOut', friendId => {
+            console.log("친구가 나갔네");
+            console.log(friendId);
+            this.outFriend(friendId);
+
+
+        });
+
     }
 
     render() {
-        const { sharedList,privateList, noteList, id} = this.props;
+        const { sharedList,privateList, noteList, id, friends} = this.props;
         const { createFolder,sharedFolder, deleteFolder, updateFolder, updateNote, createNote, deleteNote, setNote,setFolder} = this;
+    
         return (
             <div style={{ display: "flex" }}>
                 <Directory 
@@ -119,6 +164,7 @@ class DirectoryContainer extends Component {
                 createFolder={createFolder} updateFolder={updateFolder} deleteFolder={deleteFolder} sharedFolder={sharedFolder} 
                 createNote={createNote} updateNote={updateNote}  deleteNote={deleteNote} 
                 setNote={setNote} setFolder={setFolder}
+                friends = {friends}
                 />
             </div>
         );
@@ -129,6 +175,7 @@ export default connect(
     (state) => ({
         sharedList: state.directory.get("sharedList"),
         privateList: state.directory.get("privateList"),
+        friends: state.directory.get("friends"),
         noteList: state.directory.get("noteList"),
         folder: state.directory.get("folder"),
         id: state.user.get("id"),

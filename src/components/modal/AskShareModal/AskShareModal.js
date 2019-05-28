@@ -7,7 +7,7 @@ import Selects from "../../common/Selects";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserFriends } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Members from 'components/common/ChipsArray';
+//import Members from 'components/common/ChipsArray';
 
 // react-select
 import AsyncSelectInput from "components/common/AsyncSelectInput";
@@ -44,7 +44,7 @@ class AskShareModal extends React.Component {
                     <AsyncSelectInput handleChange={this.handle} />
                     <br /><br />
                     {/* <h3>이름</h3> */}
-                    <Members />
+                    {/* <Members /> */}
                     <br />
 
                     {/* <h3>권한</h3>
